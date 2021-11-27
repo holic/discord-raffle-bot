@@ -31,7 +31,12 @@ client.once("ready", () => {
 // });
 
 client.on("interactionCreate", async (interaction) => {
-  console.log("interactionCreate", interaction);
+  console.log("interactionCreate", interaction, {
+    isCommand: interaction.isCommand(),
+    isMessageComponent: interaction.isMessageComponent(),
+    isContextMenu: interaction.isContextMenu(),
+    isSelectMenu: interaction.isSelectMenu(),
+  });
 
   if (interaction.isContextMenu() && interaction.commandName === commandName) {
     console.log("data", interaction.options.data);
