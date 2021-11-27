@@ -31,19 +31,17 @@ client.once("ready", () => {
 // });
 
 client.on("interactionCreate", async (interaction) => {
-  console.log("interactionCreate", {
-    isCommand: interaction.isCommand(),
-    isMessageComponent: interaction.isMessageComponent(),
-    isContextMenu: interaction.isContextMenu(),
-  });
-  if (!interaction.isCommand()) return;
-  console.log("got command", interaction.commandName);
+  console.log("interactionCreate", interaction);
 
-  if (interaction.commandName === commandName) {
-    console.log("picking a winner");
-    await interaction.channel?.send("picking a winner");
-    // await interaction.reply("you did it");
-  }
+  await interaction.channel?.send("picking a winner");
+  // if (interaction.isMessageComponent()) if (!interaction.isCommand()) return;
+  // console.log("got command", interaction.commandName);
+
+  // if (interaction.commandName === commandName) {
+  //   console.log("picking a winner");
+  //   await interaction.channel?.send("picking a winner");
+  //   // await interaction.reply("you did it");
+  // }
 });
 
 client.login();
