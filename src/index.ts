@@ -34,6 +34,7 @@ client.on("interactionCreate", async (interaction) => {
   console.log("interactionCreate", interaction);
 
   if (interaction.isContextMenu() && interaction.commandName === commandName) {
+    console.log("data", interaction.options.data);
     await interaction.reply({
       content: "picking a winner",
       ephemeral: true,
