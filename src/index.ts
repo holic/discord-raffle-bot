@@ -34,8 +34,10 @@ client.on("interactionCreate", async (interaction) => {
   console.log("interactionCreate", interaction);
 
   if (interaction.isContextMenu() && interaction.commandName === commandName) {
-    await interaction.channel?.send("picked a winner");
-    await interaction.reply("picking a winner");
+    await interaction.reply({
+      content: "picking a winner",
+      ephemeral: true,
+    });
   }
 
   // if (interaction.isMessageComponent()) if (!interaction.isCommand()) return;
