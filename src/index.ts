@@ -40,6 +40,12 @@ client.on("interactionCreate", async (interaction) => {
 
   if (interaction.isContextMenu() && interaction.commandName === commandName) {
     console.log("data", interaction.options.data);
+
+    const data = interaction.options.data.find((data) => data.message);
+    if (data?.message) {
+      console.log("reactions", data.message.reactions);
+    }
+
     await interaction.reply({
       content: "picking a winner",
       ephemeral: true,
