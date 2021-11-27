@@ -31,7 +31,9 @@ client.once("ready", () => {
 // });
 
 client.on("interactionCreate", async (interaction) => {
+  console.log("interactionCreate");
   if (!interaction.isCommand()) return;
+  console.log("got command", interaction.commandName);
 
   if (interaction.commandName === commandName) {
     console.log("picking a winner");
