@@ -1,4 +1,7 @@
 import { Client, Intents, Message } from "discord.js";
+
+const commandName = "Pick a raffle winner";
+
 const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
 });
@@ -13,15 +16,23 @@ client.once("ready", () => {
 
   commands?.create({
     type: "MESSAGE",
-    name: "Pick a raffle winner",
+    name: commandName,
   });
 });
 
-client.on("message", (msg: Message) => {
-  if (msg.content === "ping") {
-    msg.reply("Pong 🏓");
-  } else if (msg.content === "hello") {
-    msg.reply("Choo choo! 🚅");
+// client.on("message", (msg: Message) => {
+//   if (msg.content === "ping") {
+//     msg.reply("Pong 🏓");
+//   } else if (msg.content === "hello") {
+//     msg.reply("Choo choo! 🚅");
+//   }
+// });
+
+client.on("interaction", async (interaction) => {
+  if (!interaction.isCommand()) return;
+
+  if (interaction.commandName === commandName) {
+    await interaction.reply("you did it");
   }
 });
 
