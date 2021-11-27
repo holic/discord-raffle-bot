@@ -1,6 +1,6 @@
 import { Client, Intents, Message } from "discord.js";
 
-const commandName = "Pick a raffle winner";
+const commandName = "Raffle it";
 
 const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
@@ -18,6 +18,8 @@ client.once("ready", () => {
     type: "MESSAGE",
     name: commandName,
   });
+
+  console.log("ready to go");
 });
 
 // client.on("message", (msg: Message) => {
@@ -32,6 +34,7 @@ client.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) return;
 
   if (interaction.commandName === commandName) {
+    console.log("picking a winner");
     await interaction.channel?.send("picking a winner");
     // await interaction.reply("you did it");
   }
