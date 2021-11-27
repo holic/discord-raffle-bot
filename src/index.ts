@@ -28,11 +28,12 @@ client.once("ready", () => {
 //   }
 // });
 
-client.on("interaction", async (interaction) => {
+client.on("interactionCreate", async (interaction) => {
   if (!interaction.isCommand()) return;
 
   if (interaction.commandName === commandName) {
-    await interaction.reply("you did it");
+    await interaction.channel?.send("picking a winner");
+    // await interaction.reply("you did it");
   }
 });
 
