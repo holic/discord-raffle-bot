@@ -1,6 +1,6 @@
 import { Client, Intents, Message } from "discord.js";
 
-const commandName = "Raffle it";
+const commandName = "Pick a raffle winner";
 
 const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
@@ -31,7 +31,11 @@ client.once("ready", () => {
 // });
 
 client.on("interactionCreate", async (interaction) => {
-  console.log("interactionCreate");
+  console.log("interactionCreate", {
+    isCommand: interaction.isCommand(),
+    isMessageComponent: interaction.isMessageComponent(),
+    isContextMenu: interaction.isContextMenu(),
+  });
   if (!interaction.isCommand()) return;
   console.log("got command", interaction.commandName);
 
