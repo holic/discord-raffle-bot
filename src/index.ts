@@ -33,7 +33,11 @@ client.once("ready", () => {
 client.on("interactionCreate", async (interaction) => {
   console.log("interactionCreate", interaction);
 
-  await interaction.channel?.send("picking a winner");
+  if (interaction.isContextMenu() && interaction.commandName === commandName) {
+    await interaction.channel?.send("picked a winner");
+    await interaction.reply("picking a winner");
+  }
+
   // if (interaction.isMessageComponent()) if (!interaction.isCommand()) return;
   // console.log("got command", interaction.commandName);
 
