@@ -1,4 +1,4 @@
-import { Client, Intents, Message } from "discord.js";
+import { Client, Intents, Message, ReactionManager } from "discord.js";
 
 const commandName = "Pick a raffle winner";
 
@@ -44,6 +44,9 @@ client.on("interactionCreate", async (interaction) => {
     const data = interaction.options.data.find((data) => data.message);
     if (data?.message) {
       console.log("reactions", data.message.reactions);
+      if (data.message.reactions instanceof ReactionManager) {
+        console.log("reactions cache", data.message.reactions.cache);
+      }
     }
 
     await interaction.reply({
