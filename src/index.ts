@@ -15,7 +15,7 @@ const commandName = "Pick a raffle winner";
 const cooldownRoleName = "Raffle cooldown";
 
 bot.on("ready", async () => {
-  console.log("ready");
+  console.log("ready", new Date());
 
   const commands = await bot.getCommands();
   console.log("commands", commands);
