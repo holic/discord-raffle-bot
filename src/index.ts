@@ -52,21 +52,35 @@ bot.on("interactionCreate", async (interaction) => {
 
   const channelPermissions = channel.permissionsOf(bot.user.id);
   if (!channelPermissions.has("readMessages")) {
+    console.log(
+      "skipping, missing readMessages permission for channel",
+      channel.id
+    );
     return await interaction.createMessage({
-      content: "I don't have permissions to read messages in this channel.",
+      content:
+        "I don't have permissions to read messages in this channel. If this is a private channel, you can add the `Raffle Bot` role to the channel permissions to give me access.",
       flags: Eris.Constants.MessageFlags.EPHEMERAL,
     });
   }
   if (!channelPermissions.has("sendMessages")) {
+    console.log(
+      "skipping, missing sendMessages permission for channel",
+      channel.id
+    );
     return await interaction.createMessage({
-      content: "I don't have permissions to send messages in this channel.",
+      content:
+        "I don't have permissions to send messages in this channel. Add 'Raffle Bot' role to this channel. If this is a private channel, you can add the `Raffle Bot` role to the channel permissions to give me access.",
       flags: Eris.Constants.MessageFlags.EPHEMERAL,
     });
   }
   if (!channelPermissions.has("addReactions")) {
+    console.log(
+      "skipping, missing addReactions permission for channel",
+      channel.id
+    );
     return await interaction.createMessage({
       content:
-        "I don't have permissions to add reactions to messages in this channel.",
+        "I don't have permissions to add reactions to messages in this channel. Add 'Raffle Bot' role to this channel. If this is a private channel, you can add the `Raffle Bot` role to the channel permissions to give me access.",
       flags: Eris.Constants.MessageFlags.EPHEMERAL,
     });
   }
