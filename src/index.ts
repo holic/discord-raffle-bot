@@ -11,6 +11,7 @@ const bot = Eris(process.env.DISCORD_TOKEN!, {
   intents: ["guilds", "guildMessages", "guildMembers", "guildMessageReactions"],
 });
 
+const commandId = "915646390997237791";
 const commandName = "Pick a raffle winner";
 const cooldownRoleName = "Raffle cooldown";
 
@@ -18,13 +19,15 @@ bot.on("ready", async () => {
   console.log("ready", new Date());
 
   const commands = await bot.getCommands();
-  console.log("commands", commands);
 
-  const command = await bot.createCommand({
-    type: Eris.Constants.ApplicationCommandTypes.MESSAGE,
-    name: commandName,
-  });
-  console.log("created command", command);
+  const command =
+    commands.find((command) => command.id === commandId) ||
+    (await bot.createCommand({
+      // TODO: figure out how to update command if the constructor changes
+      type: Eris.Constants.ApplicationCommandTypes.MESSAGE,
+      name: commandName,
+    }));
+  console.log("found/created command", command);
 });
 
 bot.on("interactionCreate", async (interaction) => {
