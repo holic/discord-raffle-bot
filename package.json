@@ -5,12 +5,12 @@
   "author": "PantheraRed",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon src/index.ts",
+    "dev": "env $(cat .env.local) nodemon src/index.ts",
     "build": "tsc",
     "start": "node ."
   },
   "dependencies": {
-    "discord.js": "^13.1.0"
+    "eris": "^0.16.1"
   },
   "devDependencies": {
     "@types/node": "^16.6.2",

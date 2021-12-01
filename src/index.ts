@@ -1,68 +1,126 @@
-import { Client, Intents, Message, ReactionManager } from "discord.js";
+import Eris from "eris";
+
+// bot needs to be installed with oauth scopes: bot, applications.commands
+//   and bot permissions: Manage Roles
+// bot also needs to have privileged gateway intents enabled
+//   just server members for now, but presence soon? and message content may be worth having
+
+// https://discord.com/api/oauth2/authorize?client_id=914226280881348618&permissions=0&scope=bot%20applications.commands
+
+const bot = Eris(process.env.DISCORD_TOKEN!, {
+  intents: ["guilds", "guildMessages", "guildMembers", "guildMessageReactions"],
+});
 
 const commandName = "Pick a raffle winner";
+const cooldownRoleName = "Raffle cooldown";
 
-const client = new Client({
-  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
-});
+bot.on("ready", async () => {
+  console.log("ready");
 
-client.once("ready", () => {
-  console.log(`Logged in as ${client.user?.tag}!`);
+  const commands = await bot.getCommands();
+  console.log("commands", commands);
 
-  const guildId = "914227570025840730";
-  const guild = client.guilds.cache.get(guildId);
-
-  const commands = guild?.commands || client.application?.commands;
-
-  commands?.create({
-    type: "MESSAGE",
+  const command = await bot.createCommand({
+    type: Eris.Constants.ApplicationCommandTypes.MESSAGE,
     name: commandName,
   });
-
-  console.log("ready to go");
+  console.log("created command", command);
 });
 
-// client.on("message", (msg: Message) => {
-//   if (msg.content === "ping") {
-//     msg.reply("Pong 🏓");
-//   } else if (msg.content === "hello") {
-//     msg.reply("Choo choo! 🚅");
-//   }
-// });
+bot.on("interactionCreate", async (interaction) => {
+  console.log("interactionCreate", interaction);
+  if (!(interaction instanceof Eris.CommandInteraction)) return;
+  if (interaction.data.name !== commandName) return;
 
-client.on("interactionCreate", async (interaction) => {
-  console.log("interactionCreate", interaction, {
-    isCommand: interaction.isCommand(),
-    isMessageComponent: interaction.isMessageComponent(),
-    isContextMenu: interaction.isContextMenu(),
-    isSelectMenu: interaction.isSelectMenu(),
-  });
-
-  if (interaction.isContextMenu() && interaction.commandName === commandName) {
-    console.log("data", interaction.options.data);
-
-    const data = interaction.options.data.find((data) => data.message);
-    if (data?.message) {
-      console.log("reactions", data.message.reactions);
-      if (data.message.reactions instanceof ReactionManager) {
-        console.log("reactions cache", data.message.reactions.cache);
-      }
-    }
-
-    await interaction.reply({
-      content: "picking a winner",
-      ephemeral: true,
+  // Wait for "ready" event, otherwise guilds won't be populated
+  if (!bot.ready) {
+    return await interaction.createMessage({
+      content: "Oops, I'm still booting up… try again in a few seconds?",
+      flags: Eris.Constants.MessageFlags.EPHEMERAL,
     });
   }
 
-  // if (interaction.isMessageComponent()) if (!interaction.isCommand()) return;
-  // console.log("got command", interaction.commandName);
+  const guildId = interaction.guildID;
+  if (!guildId) return;
 
-  // if (interaction.commandName === commandName) {
-  //   console.log("picking a winner");
-  //   await interaction.channel?.send("picking a winner");
-  //   // await interaction.reply("you did it");
-  // }
+  const guild = bot.guilds.get(guildId);
+  if (!guild) return;
+
+  if (!interaction.member) return;
+  if (!interaction.member.permissions.has("administrator")) {
+    return await interaction.createMessage({
+      content: "You don't have permission to run this command.",
+      flags: Eris.Constants.MessageFlags.EPHEMERAL,
+    });
+  }
+
+  // Find or create role used for raffle cooldowns
+  const cooldownRole =
+    guild.roles.find((role) => role.name === cooldownRoleName) ||
+    (await guild.createRole({
+      name: cooldownRoleName,
+    }));
+
+  const messageId = interaction.data.target_id;
+  if (!messageId) return;
+
+  const message = await bot.getMessage(interaction.channel.id, messageId);
+  const reaction = message.reactions["🎉"];
+  if (!reaction) {
+    return await interaction.createMessage({
+      content: "No one has reacted with a 🎉 yet.",
+      flags: Eris.Constants.MessageFlags.EPHEMERAL,
+    });
+  }
+  if (reaction.count > 100) {
+    return await interaction.createMessage({
+      content: "I can't do raffles for >100 people yet. Sorry!",
+      flags: Eris.Constants.MessageFlags.EPHEMERAL,
+    });
+  }
+
+  // TODO: paginate and remove the >100 check above
+  const userReactions = await message.getReaction("🎉", {
+    limit: 100,
+  });
+  if (!userReactions.length) {
+    return await interaction.createMessage({
+      content: "No one has reacted with a 🎉 yet.",
+      flags: Eris.Constants.MessageFlags.EPHEMERAL,
+    });
+  }
+
+  const members = await guild.fetchMembers({
+    userIDs: userReactions.map((user) => user.id),
+  });
+
+  const eligibleMembers = members.filter(
+    (member) => !member.roles.includes(cooldownRole.id)
+  );
+  if (!eligibleMembers.length) {
+    return await interaction.createMessage({
+      content: `No one is eligible. Remove folks from ${cooldownRole.mention} and try again?`,
+      flags: Eris.Constants.MessageFlags.EPHEMERAL,
+    });
+  }
+
+  await interaction.acknowledge();
+
+  const winnerIndex = Math.floor(Math.random() * eligibleMembers.length);
+  const winner = eligibleMembers[winnerIndex];
+  await winner.addRole(cooldownRole.id);
+  await message.addReaction("✅");
+
+  await bot.createMessage(interaction.channel.id, {
+    content: `And the winner is … ${winner.mention}!`,
+    messageReference: { messageID: message.id },
+  });
+
+  await interaction.deleteOriginalMessage();
 });
 
-client.login();
+bot.on("error", (error) => {
+  console.error(error);
+});
+
+bot.connect();
