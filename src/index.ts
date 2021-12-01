@@ -153,3 +153,8 @@ bot.on("error", (error) => {
 });
 
 bot.connect();
+
+// Attempt to clean up on exit so we don't have a lingering bot associated with a non-running process
+process.on("exit", () => {
+  bot.disconnect({ reconnect: false });
+});
