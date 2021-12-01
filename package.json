@@ -7,10 +7,11 @@
   "scripts": {
     "dev": "env $(cat .env.local) nodemon src/index.ts",
     "build": "tsc",
-    "start": "node ."
+    "start": "node --require source-map-support/register ."
   },
   "dependencies": {
-    "eris": "^0.16.1"
+    "eris": "^0.16.1",
+    "source-map-support": "^0.5.21"
   },
   "devDependencies": {
     "@types/node": "^16.6.2",
