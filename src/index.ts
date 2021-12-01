@@ -99,10 +99,11 @@ bot.on("interactionCreate", async (interaction) => {
   }
   console.log("found guild");
 
-  if (!interaction.member) {
+  const interactionMember = interaction.member;
+  if (!interactionMember) {
     return console.log("skipping, no interaction member");
   }
-  if (!interaction.member.permissions.has("administrator")) {
+  if (!interactionMember.permissions.has("administrator")) {
     console.log("interaction member does not have admin permission");
     return await interaction.createMessage({
       content: "You don't have permission to run this command.",
@@ -161,9 +162,11 @@ bot.on("interactionCreate", async (interaction) => {
   });
   console.log("found users that reacted", members.length);
 
-  const eligibleMembers = members.filter(
-    (member) => !member.roles.includes(cooldownRole.id)
-  );
+  const eligibleMembers = members
+    // Exclude the person executing the command
+    .filter((member) => member.id !== interactionMember.id)
+    // Exclude anyone with the cooldown role
+    .filter((member) => !member.roles.includes(cooldownRole.id));
   console.log("found eligible users", eligibleMembers.length);
   if (!eligibleMembers.length) {
     console.log("no eligible reactions, all on cooldown?");
