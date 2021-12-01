@@ -45,6 +45,32 @@ bot.on("interactionCreate", async (interaction) => {
     });
   }
 
+  const channel = interaction.channel;
+  if (!(channel instanceof Eris.GuildChannel)) {
+    return console.log("skipping, interaction in a non-guild channel");
+  }
+
+  const channelPermissions = channel.permissionsOf(bot.user.id);
+  if (!channelPermissions.has("readMessages")) {
+    return await interaction.createMessage({
+      content: "I don't have permissions to read messages in this channel.",
+      flags: Eris.Constants.MessageFlags.EPHEMERAL,
+    });
+  }
+  if (!channelPermissions.has("sendMessages")) {
+    return await interaction.createMessage({
+      content: "I don't have permissions to send messages in this channel.",
+      flags: Eris.Constants.MessageFlags.EPHEMERAL,
+    });
+  }
+  if (!channelPermissions.has("addReactions")) {
+    return await interaction.createMessage({
+      content:
+        "I don't have permissions to add reactions to messages in this channel.",
+      flags: Eris.Constants.MessageFlags.EPHEMERAL,
+    });
+  }
+
   const guildId = interaction.guildID;
   if (!guildId) {
     return console.log("skipping, no guild ID");
