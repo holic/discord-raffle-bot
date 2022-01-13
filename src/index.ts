@@ -186,7 +186,10 @@ bot.on("interactionCreate", async (interaction) => {
   await message.addReaction("✅");
 
   await interaction.createMessage({
-    content: `And the winner is … ${winner.mention}!`,
+    content: `> ${message.content.replace(
+      /\n/g,
+      "\n> "
+    )}\nAnd the winner is … ${winner.mention}!`,
     // TODO: include original message or embed if this doesn't reply
   });
 
