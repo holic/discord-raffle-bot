@@ -185,12 +185,11 @@ bot.on("interactionCreate", async (interaction) => {
   await winner.addRole(cooldownRole.id);
   await message.addReaction("✅");
 
-  await bot.createMessage(interaction.channel.id, {
+  await interaction.createMessage({
     content: `And the winner is … ${winner.mention}!`,
-    messageReference: { messageID: message.id },
+    // TODO: include original message or embed if this doesn't reply
   });
 
-  await interaction.deleteOriginalMessage();
   console.log("interaction done!");
 });
 
